@@ -11,70 +11,75 @@ import CAtomics
 
 public struct AtomicBool
 {
-  @_versioned var val = CAtomicsBoolean()
+  @_versioned let p = UnsafeMutablePointer<CAtomicsBoolean>.allocate(capacity: 1)
 
   public init(_ value: Bool = false)
   {
-    CAtomicsBooleanInit(value, &val)
+    CAtomicsBooleanInit(value, p)
   }
 
   public var value: Bool {
     @inline(__always)
-    mutating get { return CAtomicsBooleanLoad(&val, .relaxed) }
+    get { return CAtomicsBooleanLoad(p, .relaxed) }
+  }
+
+  public func destroy()
+  {
+    p.deallocate(capacity: 1)
   }
 }
 
 extension AtomicBool
 {
   @inline(__always)
-  public mutating func load(order: LoadMemoryOrder = .relaxed)-> Bool
+  public func load(order: LoadMemoryOrder = .relaxed)-> Bool
   {
-    return CAtomicsBooleanLoad(&val, order)
+    return CAtomicsBooleanLoad(p, order)
   }
 
   @inline(__always)
-  public mutating func store(_ value: Bool, order: StoreMemoryOrder = .relaxed)
+  public func store(_ value: Bool, order: StoreMemoryOrder = .relaxed)
   {
-    CAtomicsBooleanStore(value, &val, order)
+    CAtomicsBooleanStore(value, p, order)
   }
 
   @inline(__always) @discardableResult
-  public mutating func swap(_ value: Bool, order: MemoryOrder = .relaxed)-> Bool
+  public func swap(_ value: Bool, order: MemoryOrder = .relaxed)-> Bool
   {
-    return CAtomicsBooleanSwap(value, &val, order)
+    return CAtomicsBooleanSwap(value, p, order)
   }
 
   @inline(__always) @discardableResult
-  public mutating func or(_ value: Bool, order: MemoryOrder = .relaxed)-> Bool
+  public func or(_ value: Bool, order: MemoryOrder = .relaxed)-> Bool
   {
-    return CAtomicsBooleanOr(value, &val, order)
+    return CAtomicsBooleanOr(value, p, order)
   }
 
   @inline(__always) @discardableResult
-  public mutating func xor(_ value: Bool, order: MemoryOrder = .relaxed)-> Bool
+  public func xor(_ value: Bool, order: MemoryOrder = .relaxed)-> Bool
   {
-    return CAtomicsBooleanXor(value, &val, order)
+    return CAtomicsBooleanXor(value, p, order)
   }
 
   @inline(__always) @discardableResult
-  public mutating func and(_ value: Bool, order: MemoryOrder = .relaxed)-> Bool
+  public func and(_ value: Bool, order: MemoryOrder = .relaxed)-> Bool
   {
-    return CAtomicsBooleanAnd(value, &val, order)
+    return CAtomicsBooleanAnd(value, p, order)
   }
 
   @inline(__always) @discardableResult
-  public mutating func loadCAS(current: UnsafeMutablePointer<Bool>, future: Bool,
-                               type: CASType = .weak,
-                               orderSwap: MemoryOrder = .relaxed,
-                               orderLoad: LoadMemoryOrder = .relaxed) -> Bool
+  public func loadCAS(current: UnsafeMutablePointer<Bool>, future: Bool,
+                      type: CASType = .weak,
+                      orderSwap: MemoryOrder = .relaxed,
+                      orderLoad: LoadMemoryOrder = .relaxed) -> Bool
   {
-    return CAtomicsBooleanCAS(current, future, &val, type, orderSwap, orderLoad)
+    return CAtomicsBooleanCAS(current, future, p, type, orderSwap, orderLoad)
   }
 
   @inline(__always) @discardableResult
-  public mutating func CAS(current: Bool, future: Bool,
-                           type: CASType = .weak,
-                           order: MemoryOrder = .relaxed) -> Bool
+  public func CAS(current: Bool, future: Bool,
+                  type: CASType = .weak,
+                  order: MemoryOrder = .relaxed) -> Bool
   {
     var expect = current
     return loadCAS(current: &expect, future: future, type: type, orderSwap: order, orderLoad: .relaxed)

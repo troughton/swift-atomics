@@ -14,68 +14,73 @@ import CAtomics
 
 public struct ${AtomicType}
 {
-  @_versioned var val = ${CAtomicsType}()
+  @_versioned let p = UnsafeMutablePointer<${CAtomicsType}>.allocate(capacity: 1)
 
   public init(_ value: ${IntType} = 0)
   {
-    ${CAtomicsType}Init(value, &val)
+    ${CAtomicsType}Init(value, p)
   }
 
   public var value: ${IntType} {
     @inline(__always)
-    mutating get { return ${CAtomicsType}Load(&val, .relaxed) }
+    get { return ${CAtomicsType}Load(p, .relaxed) }
+  }
+
+  public func destroy()
+  {
+    p.deallocate(capacity: 1)
   }
 }
 
 extension ${AtomicType}
 {
   @inline(__always)
-  public mutating func load(order: LoadMemoryOrder = .relaxed) -> ${IntType}
+  public func load(order: LoadMemoryOrder = .relaxed) -> ${IntType}
   {
-    return ${CAtomicsType}Load(&val, order)
+    return ${CAtomicsType}Load(p, order)
   }
 
   @inline(__always)
-  public mutating func store(_ value: ${IntType}, order: StoreMemoryOrder = .relaxed)
+  public func store(_ value: ${IntType}, order: StoreMemoryOrder = .relaxed)
   {
-    ${CAtomicsType}Store(value, &val, order)
+    ${CAtomicsType}Store(value, p, order)
   }
 
   @inline(__always)
-  public mutating func swap(_ value: ${IntType}, order: MemoryOrder = .relaxed) -> ${IntType}
+  public func swap(_ value: ${IntType}, order: MemoryOrder = .relaxed) -> ${IntType}
   {
-    return ${CAtomicsType}Swap(value, &val, order)
+    return ${CAtomicsType}Swap(value, p, order)
   }
 
 % for (rmwMethod, rmwFunc, rmwParam) in [('add', 'Add', 'delta'), ('subtract', 'Sub', 'delta'), ('bitwiseOr', 'Or', 'bits'), ('bitwiseXor', 'Xor', 'bits'), ('bitwiseAnd', 'And', 'bits')]:
   @inline(__always) @discardableResult
-  public mutating func ${rmwMethod}(_ ${rmwParam}: ${IntType}, order: MemoryOrder = .relaxed) -> ${IntType}
+  public func ${rmwMethod}(_ ${rmwParam}: ${IntType}, order: MemoryOrder = .relaxed) -> ${IntType}
   {
-    return ${CAtomicsType}${rmwFunc}(${rmwParam}, &val, order)
+    return ${CAtomicsType}${rmwFunc}(${rmwParam}, p, order)
   }
 
 % end
 % for (inc, op) in [('increment', 'Add'), ('decrement', 'Sub')]:
   @inline(__always) @discardableResult
-  public mutating func ${inc}(order: MemoryOrder = .relaxed) -> ${IntType}
+  public func ${inc}(order: MemoryOrder = .relaxed) -> ${IntType}
   {
-    return ${CAtomicsType}${op}(1, &val, order)
+    return ${CAtomicsType}${op}(1, p, order)
   }
 
 % end
   @inline(__always) @discardableResult
-  public mutating func loadCAS(current: UnsafeMutablePointer<${IntType}>, future: ${IntType},
-                               type: CASType = .weak,
-                               orderSwap: MemoryOrder = .relaxed,
-                               orderLoad: LoadMemoryOrder = .relaxed) -> Bool
+  public func loadCAS(current: UnsafeMutablePointer<${IntType}>, future: ${IntType},
+                      type: CASType = .weak,
+                      orderSwap: MemoryOrder = .relaxed,
+                      orderLoad: LoadMemoryOrder = .relaxed) -> Bool
   {
-    return ${CAtomicsType}CAS(current, future, &val, type, orderSwap, orderLoad)
+    return ${CAtomicsType}CAS(current, future, p, type, orderSwap, orderLoad)
   }
 
   @inline(__always) @discardableResult
-  public mutating func CAS(current: ${IntType}, future: ${IntType},
-                           type: CASType = .weak,
-                           order: MemoryOrder = .relaxed) -> Bool
+  public func CAS(current: ${IntType}, future: ${IntType},
+                  type: CASType = .weak,
+                  order: MemoryOrder = .relaxed) -> Bool
   {
     var expect = current
     return loadCAS(current: &expect, future: future, type: type, orderSwap: order, orderLoad: .relaxed)
