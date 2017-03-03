@@ -27,51 +27,56 @@ public class AtomicsPerformanceTests: XCTestCase
   public func testPerformanceStore()
   {
     let c = testLoopCount
-    var m = AtomicInt(0)
+    let m = AtomicInt(0)
     measure {
       m.store(0)
       for i in 0..<c { m.store(i, order: .relaxed) }
     }
+    m.destroy()
   }
 
   public func testPerformanceSynchronizedStore()
   {
     let c = testLoopCount
-    var m = AtomicInt(0)
+    let m = AtomicInt(0)
     measure {
       m.store(0)
       for i in 0..<c { m.store(i, order: .sequential) }
     }
+    m.destroy()
   }
 
   public func testPerformanceRead()
   {
     let c = testLoopCount
-    var m = AtomicInt(0)
+    let m = AtomicInt(0)
     measure {
       m.store(0)
       for _ in 0..<c { _ = m.load(order: .relaxed) }
     }
+    m.destroy()
   }
 
   public func testPerformanceSynchronizedRead()
   {
     let c = testLoopCount
-    var m = AtomicInt(0)
+    let m = AtomicInt(0)
     measure {
       m.store(0)
       for _ in 0..<c { _ = m.load(order: .sequential) }
     }
+    m.destroy()
   }
 
   public func testPerformanceSwiftCASSuccess()
   {
     let c = Int32(testLoopCount)
-    var m = AtomicInt32(0)
+    let m = AtomicInt32(0)
     measure {
       m.store(0)
       for i in (m.value)..<c { m.CAS(current: i, future: i&+1) }
     }
+    m.destroy()
   }
 
   public func testPerformanceOSAtomicCASSuccess()
@@ -91,11 +96,12 @@ public class AtomicsPerformanceTests: XCTestCase
   public func testPerformanceSwiftCASFailure()
   {
     let c = Int32(testLoopCount)
-    var m = AtomicInt32(0)
+    let m = AtomicInt32(0)
     measure {
       m.store(0)
       for i in (m.value)..<c { m.CAS(current: i, future: 0) }
     }
+    m.destroy()
   }
 
   public func testPerformanceOSAtomicCASFailure()

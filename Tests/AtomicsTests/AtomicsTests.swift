@@ -78,7 +78,7 @@ public class AtomicsTests: XCTestCase
 
   public func testInt()
   {
-    var i = AtomicInt()
+    let i = AtomicInt()
     XCTAssert(i.value == 0)
 
   #if swift(>=4.0)
@@ -139,11 +139,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testUInt()
   {
-    var i = AtomicUInt()
+    let i = AtomicUInt()
     XCTAssert(i.value == 0)
 
   #if swift(>=4.0)
@@ -204,11 +206,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testInt8()
   {
-    var i = AtomicInt8()
+    let i = AtomicInt8()
     XCTAssert(i.value == 0)
 
   #if swift(>=4.0)
@@ -269,11 +273,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testUInt8()
   {
-    var i = AtomicUInt8()
+    let i = AtomicUInt8()
     XCTAssert(i.value == 0)
 
   #if swift(>=4.0)
@@ -334,11 +340,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testInt16()
   {
-    var i = AtomicInt16()
+    let i = AtomicInt16()
     XCTAssert(i.value == 0)
 
   #if swift(>=4.0)
@@ -399,11 +407,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testUInt16()
   {
-    var i = AtomicUInt16()
+    let i = AtomicUInt16()
     XCTAssert(i.value == 0)
 
   #if swift(>=4.0)
@@ -464,11 +474,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testInt32()
   {
-    var i = AtomicInt32()
+    let i = AtomicInt32()
     XCTAssert(i.value == 0)
 
   #if swift(>=4.0)
@@ -529,11 +541,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testUInt32()
   {
-    var i = AtomicUInt32()
+    let i = AtomicUInt32()
     XCTAssert(i.value == 0)
 
   #if swift(>=4.0)
@@ -594,11 +608,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testInt64()
   {
-    var i = AtomicInt64()
+    let i = AtomicInt64()
     XCTAssert(i.value == 0)
 
   #if swift(>=4.0)
@@ -659,11 +675,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testUInt64()
   {
-    var i = AtomicUInt64()
+    let i = AtomicUInt64()
     XCTAssert(i.value == 0)
 
   #if swift(>=4.0)
@@ -724,11 +742,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testUnsafeRawPointer()
   {
-    var i = AtomicRawPointer()
+    let i = AtomicRawPointer()
     XCTAssert(i.pointer == nil)
 
     let r1 = UnsafeRawPointer(bitPattern: UInt.nzRandom())
@@ -751,11 +771,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testUnsafeMutableRawPointer()
   {
-    var i = AtomicMutableRawPointer()
+    let i = AtomicMutableRawPointer()
     XCTAssert(i.pointer == nil)
 
     let r1 = UnsafeMutableRawPointer(bitPattern: UInt.nzRandom())
@@ -778,11 +800,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testUnsafePointer()
   {
-    var i = AtomicPointer<Int64>()
+    let i = AtomicPointer<Int64>()
     XCTAssert(i.pointer == nil)
 
     let r1 = UnsafePointer<Int64>(bitPattern: UInt.nzRandom())
@@ -805,11 +829,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testUnsafeMutablePointer()
   {
-    var i = AtomicMutablePointer<Int64>()
+    let i = AtomicMutablePointer<Int64>()
     XCTAssert(i.pointer == nil)
 
     let r1 = UnsafeMutablePointer<Int64>(bitPattern: UInt.nzRandom())
@@ -832,11 +858,13 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
   public func testOpaquePointer()
   {
-    var i = AtomicOpaquePointer()
+    let i = AtomicOpaquePointer()
     XCTAssert(i.pointer == nil)
 
     let r1 = OpaquePointer(bitPattern: UInt.nzRandom())
@@ -859,12 +887,14 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
 
   public func testBool()
   {
-    var boolean = AtomicBool(false)
+    let boolean = AtomicBool(false)
     _ = AtomicBool(true)
     XCTAssert(boolean.value == false)
 
@@ -906,6 +936,8 @@ public class AtomicsTests: XCTestCase
       boolean.CAS(current: true, future: false, type: .weak)
       boolean.CAS(current: false, future: true, type: .weak)
     }
+
+    boolean.destroy()
   }
 
   public func testFence()
@@ -924,7 +956,7 @@ public class AtomicsTests: XCTestCase
   public func testUnmanaged()
   {
     var i = UInt.nzRandom()
-    var a = AtomicReference(Thing(i))
+    let a = AtomicReference(Thing(i))
     do {
       let r1 = a.swap(.none)
       print("Will release \(i)")
@@ -945,5 +977,10 @@ public class AtomicsTests: XCTestCase
     print("Will release \(i)")
     XCTAssert(a.take() != nil)
     XCTAssert(a.take() == nil)
+
+    i = UInt.nzRandom()
+    print("will release \(i)")
+    _ = a.swap(Thing(i))
+    a.destroy()
   }
 }

@@ -73,7 +73,7 @@ public class AtomicsTests: XCTestCase
 % for i in integers:
   public func test${i}()
   {
-    var i = Atomic${i}()
+    let i = Atomic${i}()
     XCTAssert(i.value == 0)
 
   #if swift(>=4.0)
@@ -135,6 +135,8 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
 %end
@@ -143,7 +145,7 @@ public class AtomicsTests: XCTestCase
 % pointee = '<Int64>' if (p == '' or p == 'Mutable') else ''
   public func test${unsafe}${p}Pointer()
   {
-    var i = Atomic${p}Pointer${pointee}()
+    let i = Atomic${p}Pointer${pointee}()
     XCTAssert(i.pointer == nil)
 
     let r1 = ${unsafe}${p}Pointer${pointee}(bitPattern: UInt.nzRandom())
@@ -166,13 +168,15 @@ public class AtomicsTests: XCTestCase
     while(!i.loadCAS(current: &j, future: r3)) {}
     XCTAssertEqual(r1, j)
     XCTAssertEqual(r3, i.load())
+
+    i.destroy()
   }
 
 %end
 
   public func testBool()
   {
-    var boolean = AtomicBool(false)
+    let boolean = AtomicBool(false)
     _ = AtomicBool(true)
     XCTAssert(boolean.value == false)
 
@@ -214,6 +218,8 @@ public class AtomicsTests: XCTestCase
       boolean.CAS(current: true, future: false, type: .weak)
       boolean.CAS(current: false, future: true, type: .weak)
     }
+
+    boolean.destroy()
   }
 
   public func testFence()
@@ -232,7 +238,7 @@ public class AtomicsTests: XCTestCase
   public func testUnmanaged()
   {
     var i = UInt.nzRandom()
-    var a = AtomicReference(Thing(i))
+    let a = AtomicReference(Thing(i))
     do {
       let r1 = a.swap(.none)
       print("Will release \(i)")
@@ -253,5 +259,10 @@ public class AtomicsTests: XCTestCase
     print("Will release \(i)")
     XCTAssert(a.take() != nil)
     XCTAssert(a.take() == nil)
+
+    i = UInt.nzRandom()
+    print("will release \(i)")
+    _ = a.swap(Thing(i))
+    a.destroy()
   }
 }
