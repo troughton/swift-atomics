@@ -50,6 +50,7 @@ public class AtomicsRaceTests: XCTestCase
 
       q.async(execute: closure)
       q.async(execute: closure)
+      q.async(flags: .barrier) {}
     }
   #else
     print("double-free crash disabled")
@@ -65,7 +66,7 @@ public class AtomicsRaceTests: XCTestCase
     for _ in 1...iterations
     {
       var p: Optional = UnsafeMutablePointer<Point>.allocate(capacity: 1)
-      var lock = AtomicInt(0)
+      let lock = AtomicInt(0)
       let closure = {
         while true
         {
@@ -87,6 +88,7 @@ public class AtomicsRaceTests: XCTestCase
 
       q.async(execute: closure)
       q.async(execute: closure)
+      q.async(flags: .barrier) { lock.destroy() }
     }
 
     q.sync(flags: .barrier) {}
@@ -98,7 +100,7 @@ public class AtomicsRaceTests: XCTestCase
 
     for _ in 1...iterations
     {
-      var p = AtomicMutablePointer(UnsafeMutablePointer<Point>.allocate(capacity: 1))
+      let p = AtomicMutablePointer(UnsafeMutablePointer<Point>.allocate(capacity: 1))
       let closure = {
         while true
         {
@@ -118,6 +120,7 @@ public class AtomicsRaceTests: XCTestCase
 
       q.async(execute: closure)
       q.async(execute: closure)
+      q.async(flags: .barrier) { p.destroy() }
     }
 
     q.sync(flags: .barrier) {}
@@ -129,7 +132,7 @@ public class AtomicsRaceTests: XCTestCase
 
     for _ in 1...iterations
     {
-      var p = AtomicMutablePointer(UnsafeMutablePointer<Point>.allocate(capacity: 1))
+      let p = AtomicMutablePointer(UnsafeMutablePointer<Point>.allocate(capacity: 1))
       let closure = {
         var c = p.pointer
         while true
@@ -148,6 +151,7 @@ public class AtomicsRaceTests: XCTestCase
 
       q.async(execute: closure)
       q.async(execute: closure)
+      q.async(flags: .barrier) { p.destroy() }
     }
 
     q.sync(flags: .barrier) {}
@@ -159,7 +163,7 @@ public class AtomicsRaceTests: XCTestCase
 
     for _ in 1...iterations
     {
-      var p = AtomicMutablePointer(UnsafeMutablePointer<Point>.allocate(capacity: 1))
+      let p = AtomicMutablePointer(UnsafeMutablePointer<Point>.allocate(capacity: 1))
       let closure = {
         while true
         {
@@ -176,6 +180,7 @@ public class AtomicsRaceTests: XCTestCase
 
       q.async(execute: closure)
       q.async(execute: closure)
+      q.async(flags: .barrier) { p.destroy() }
     }
 
     q.sync(flags: .barrier) {}
