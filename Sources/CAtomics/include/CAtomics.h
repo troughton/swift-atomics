@@ -100,8 +100,8 @@ SWIFT_ENUM(CASType, closed)
 
 // atomic integer generation
 
-#define CLANG_ATOMICS_STRUCT(swiftType, atomicType, alignment) \
-        typedef struct { volatile atomicType a __attribute__ ((aligned(alignment))); } swiftType;
+#define CLANG_ATOMICS_STRUCT(swiftType, atomicType, atomName, alignment) \
+        typedef struct { volatile atomicType atomName __attribute__ ((aligned(alignment))); } swiftType;
 
 #define CLANG_ATOMICS_IS_LOCK_FREE(swiftType) \
         static __inline__ __attribute__((__always_inline__)) \
@@ -168,7 +168,7 @@ SWIFT_ENUM(CASType, closed)
         }
 
 #define CLANG_ATOMICS_GENERATE(swiftType, atomicType, parameterType, alignment) \
-        CLANG_ATOMICS_STRUCT(swiftType, atomicType, alignment) \
+        CLANG_ATOMICS_STRUCT(swiftType, atomicType, a, alignment) \
         CLANG_ATOMICS_IS_LOCK_FREE(swiftType) \
         CLANG_ATOMICS_INITIALIZE(swiftType, parameterType) \
         CLANG_ATOMICS_CREATE(swiftType, parameterType) \
@@ -273,7 +273,7 @@ CLANG_ATOMICS_BOOL_GENERATE(AtomicCacheLineAlignedBool, atomic_bool, _Bool, __CA
         }
 
 #define CLANG_ATOMICS_POINTER_GENERATE(swiftType, atomicType, parameterType, nullability, alignment) \
-        CLANG_ATOMICS_STRUCT(swiftType, atomicType, alignment) \
+        CLANG_ATOMICS_STRUCT(swiftType, atomicType, a, alignment) \
         CLANG_ATOMICS_IS_LOCK_FREE(swiftType) \
         CLANG_ATOMICS_POINTER_INITIALIZE(swiftType, parameterType, nullability) \
         CLANG_ATOMICS_POINTER_CREATE(swiftType, parameterType, nullability) \
@@ -394,7 +394,7 @@ CLANG_ATOMICS_POINTER_GENERATE(AtomicOptionalOpaquePointer, atomic_uintptr_t, st
         CLANG_ATOMICS_TAGGED_POINTER_INCREMENT(swiftType)
 
 #define CLANG_ATOMICS_ATOMIC_TAGGED_POINTER_GENERATE(atomicType, structType, alignment) \
-        CLANG_ATOMICS_STRUCT(atomicType, _Atomic(__UNION_TYPE), alignment) \
+        CLANG_ATOMICS_STRUCT(atomicType, _Atomic(__UNION_TYPE), a, alignment) \
         CLANG_ATOMICS_IS_LOCK_FREE(atomicType) \
         CLANG_ATOMICS_TAGGED_POINTER_INITIALIZE(atomicType, structType) \
         CLANG_ATOMICS_TAGGED_POINTER_LOAD(atomicType, structType) \
@@ -418,6 +418,15 @@ CLANG_ATOMICS_TAGGED_POINTER_GENERATE(TaggedOptionalMutableRawPointer, void*, _N
 CLANG_ATOMICS_ATOMIC_TAGGED_POINTER_GENERATE(AtomicTaggedOptionalMutableRawPointer, TaggedOptionalMutableRawPointer, _Alignof(_Atomic(__UNION_TYPE)))
 CLANG_ATOMICS_ATOMIC_TAGGED_POINTER_GENERATE(AtomicCacheLineAlignedTaggedOptionalMutableRawPointer, TaggedOptionalMutableRawPointer, __CACHE_LINE_WIDTH)
 
+// non-atomic padded pointer wrappers
+
+#ifdef __CACHE_LINE_WIDTH
+CLANG_ATOMICS_STRUCT(CacheLineAlignedRawPointer, const void *_Nonnull, pointer, __CACHE_LINE_WIDTH)
+CLANG_ATOMICS_STRUCT(CacheLineAlignedOptionalRawPointer, const void *_Nullable, pointer, __CACHE_LINE_WIDTH)
+CLANG_ATOMICS_STRUCT(CacheLineAlignedMutableRawPointer, void *_Nonnull, pointer, __CACHE_LINE_WIDTH)
+CLANG_ATOMICS_STRUCT(CacheLineAlignedOptionalMutableRawPointer, void *_Nullable, pointer, __CACHE_LINE_WIDTH)
+#endif
+
 // fence
 
 static __inline__ __attribute__((__always_inline__))
@@ -431,7 +440,7 @@ void CAtomicsThreadFence(enum MemoryOrder order)
 #define __OPAQUE_UNMANAGED_LOCKED   (uintptr_t)0x7
 #define __OPAQUE_UNMANAGED_SPINMASK (char)0xc0
 
-CLANG_ATOMICS_STRUCT(OpaqueUnmanagedHelper, atomic_uintptr_t, _Alignof(atomic_uintptr_t))
+CLANG_ATOMICS_STRUCT(OpaqueUnmanagedHelper, atomic_uintptr_t, a, _Alignof(atomic_uintptr_t))
 CLANG_ATOMICS_IS_LOCK_FREE(OpaqueUnmanagedHelper)
 CLANG_ATOMICS_POINTER_INITIALIZE(OpaqueUnmanagedHelper, const void*, _Nullable)
 

@@ -21,6 +21,7 @@ extension CAtomicsBasicTests {
         ("testAtomicTaggedOptionalRawPointer", testAtomicTaggedOptionalRawPointer),
         ("testAtomicTaggedRawPointer", testAtomicTaggedRawPointer),
         ("testBool", testBool),
+        ("testCacheLineAlignedPointers", testCacheLineAlignedPointers),
         ("testFence", testFence),
         ("testInt", testInt),
         ("testInt16", testInt16),
